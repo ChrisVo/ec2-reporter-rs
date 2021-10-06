@@ -60,11 +60,11 @@ async fn get_instances(account_id: &String, region: RegionInfo<'_>) {
                     }
                 }
             }
+        }
         Err(_) => {
             println!("Couldn't list instances in AWS account {}", account_id)
         }
     }
-    println!("\n")
 }
 
 async fn get_account_id() -> String {
@@ -72,10 +72,7 @@ async fn get_account_id() -> String {
     let req: GetCallerIdentityRequest = Default::default();
     let caller_identity = sts_client.get_caller_identity(req).await;
     match caller_identity {
-        Ok(identity) => {
-            identity.account.expect("No account ID detected")
-        }
-        Err(_) => String::from("Couldn't get account ID")
+        Ok(identity) => identity.account.expect("No account ID detected"),
+        Err(_) => String::from("Couldn't get account ID"),
     }
-
 }
