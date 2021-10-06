@@ -40,9 +40,8 @@ fn get_regions() -> [RegionInfo<'static>; 4] {
     ]
 }
 
-async fn get_instances() {
-    let region = Region::UsEast2;
-    let ec2_client = Ec2Client::new(region);
+async fn get_instances(account_id: &String, region: RegionInfo<'_>) {
+    let ec2_client = Ec2Client::new(region.region);
     let ec2_instances_input: DescribeInstancesRequest = Default::default();
     let instances = ec2_client.describe_instances(ec2_instances_input).await;
     let account_id = get_account_id().await;
