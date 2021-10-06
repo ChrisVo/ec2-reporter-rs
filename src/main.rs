@@ -47,6 +47,9 @@ async fn get_instances(account_id: &String, region: RegionInfo<'_>) {
     println!("\nChecking region {}", region.friendly_name);
     match instances {
         Ok(output) => {
+            if output.reservations.as_ref().unwrap().is_empty() {
+                println!("{} does not have any instances\n", region.friendly_name);
+            } else {
             for reservation in output.reservations.iter() {
                 for reservations in reservation.iter() {
                     for instances in reservations.instances.iter() {
