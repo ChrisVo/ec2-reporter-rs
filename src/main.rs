@@ -5,7 +5,39 @@ use std::default::Default;
 
 #[tokio::main]
 async fn main() {
-    get_instances().await;
+    let account_id = get_account_id().await;
+    println!("\n🚀 Getting instances in AWS Account {}\n", account_id);
+    let regions = get_regions();
+    for region in regions {
+        get_instances(&account_id, region).await;
+    }
+    println!("\n✅ All done!\n")
+}
+
+struct RegionInfo<'a> {
+    region: Region,
+    friendly_name: &'a str,
+}
+
+fn get_regions() -> [RegionInfo<'static>; 4] {
+    [
+        RegionInfo {
+            region: Region::UsEast1,
+            friendly_name: Region::UsEast1.name(),
+        },
+        RegionInfo {
+            region: Region::UsEast2,
+            friendly_name: Region::UsEast2.name(),
+        },
+        RegionInfo {
+            region: Region::UsWest1,
+            friendly_name: Region::UsWest1.name(),
+        },
+        RegionInfo {
+            region: Region::UsWest2,
+            friendly_name: Region::UsWest2.name(),
+        },
+    ]
 }
 
 async fn get_instances() {
