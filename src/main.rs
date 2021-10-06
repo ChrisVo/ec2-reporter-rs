@@ -50,16 +50,16 @@ async fn get_instances(account_id: &String, region: RegionInfo<'_>) {
             if output.reservations.as_ref().unwrap().is_empty() {
                 println!("{} does not have any instances\n", region.friendly_name);
             } else {
-            for reservation in output.reservations.iter() {
-                for reservations in reservation.iter() {
-                    for instances in reservations.instances.iter() {
-                        for instance in instances.iter() {
-                            println!("\t- {}", instance.instance_id.as_ref().unwrap())
+                for reservation in output.reservations.iter() {
+                    for reservations in reservation.iter() {
+                        for instances in reservations.instances.iter() {
+                            for instance in instances.iter() {
+                                println!("\t- {}", instance.instance_id.as_ref().unwrap())
+                            }
                         }
                     }
                 }
             }
-        }
         Err(_) => {
             println!("Couldn't list instances in AWS account {}", account_id)
         }
