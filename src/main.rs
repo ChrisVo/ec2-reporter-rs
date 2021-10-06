@@ -1,5 +1,6 @@
 use rusoto_core::Region;
 use rusoto_ec2::{DescribeInstancesRequest, Ec2, Ec2Client};
+use rusoto_sts::{GetCallerIdentityRequest, Sts, StsClient};
 use std::default::Default;
 
 #[tokio::main]
@@ -8,23 +9,40 @@ async fn main() {
 }
 
 async fn get_instances() {
-    let client = Ec2Client::new(Region::UsEast2);
+    let region = Region::UsEast2;
+    let ec2_client = Ec2Client::new(region);
     let ec2_instances_input: DescribeInstancesRequest = Default::default();
-    // ec2_instances_input.max_results = Some(5);
-    let instances = client.describe_instances(ec2_instances_input).await;
-
+    let instances = ec2_client.describe_instances(ec2_instances_input).await;
+    let account_id = get_account_id().await;
+    println!("\nInstances in AWS Account ID {}", account_id);
     match instances {
         Ok(output) => {
             for reservation in output.reservations.iter() {
                 for reservations in reservation.iter() {
                     for instances in reservations.instances.iter() {
                         for instance in instances.iter() {
-                            println!("{:?}", instance.instance_id)
+                            println!("\t- {}", instance.instance_id.as_ref().unwrap())
                         }
                     }
                 }
             }
         }
-        Err(err) => println!("{:?}", err),
+        Err(_) => {
+            println!("Couldn't list instances in AWS account {}", account_id)
+        }
     }
+    println!("\n")
+}
+
+async fn get_account_id() -> String {
+    let sts_client = StsClient::new(Region::UsEast2);
+    let req: GetCallerIdentityRequest = Default::default();
+    let caller_identity = sts_client.get_caller_identity(req).await;
+    match caller_identity {
+        Ok(identity) => {
+            identity.account.expect("No account ID detected")
+        }
+        Err(_) => String::from("Couldn't get account ID")
+    }
+
 }
