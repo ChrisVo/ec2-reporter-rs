@@ -44,8 +44,7 @@ async fn get_instances(account_id: &String, region: RegionInfo<'_>) {
     let ec2_client = Ec2Client::new(region.region);
     let ec2_instances_input: DescribeInstancesRequest = Default::default();
     let instances = ec2_client.describe_instances(ec2_instances_input).await;
-    let account_id = get_account_id().await;
-    println!("\nInstances in AWS Account ID {}", account_id);
+    println!("\nChecking region {}", region.friendly_name);
     match instances {
         Ok(output) => {
             for reservation in output.reservations.iter() {
